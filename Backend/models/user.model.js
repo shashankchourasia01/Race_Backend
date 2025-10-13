@@ -35,12 +35,15 @@ const userSchema = new mongoose.Schema({
 
 // generate token for user
 userSchema.methods.generateAuthToken = function() {
-    const token = jwt.sign({ _id: this._id}, process.env.JWT_SECRET)
+    const token = jwt.sign({ _id: this._id}, process.env.JWT_SECRET, { expiresIn: '1d' } );
     return token;
 }
 
 // compare password method
 userSchema.methods.comparePassword = async function (password) {
+    if (!this.password) {
+        throw new Error('Password not set for this user');
+    }
     return await bcrypt.compare(password, this.password);
 }
 
